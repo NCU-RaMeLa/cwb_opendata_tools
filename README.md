@@ -21,13 +21,13 @@ matplotlib<br>
 
 # 支援的檔案格式
 支援氣象局二維全台雷達整合資料之gzip壓縮格式 (e.q. COMPREF.20211127.1430.gz)<br>
-P.S.若已解壓縮，則gzipped自行改成false
+P.S.若已解壓縮，則gzipped自行改成False
 
 
 # 下載 CWB Open weather data
-此module另有CWB open data雷達回波資料下載用插件方便即時import雷達資料<br>
+此module另有CWB open data雷達回波資料下載用插件方便下載雷達資料<br>
 (需要有氣象會員授權碼: CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)<br>
-預設存檔於 './radar/cwb_opendata', 檔名為COMPREF.OpenData.yyyymmdd.HHMM.gz<br>
+預設存檔於 './radar/cwb_opendata_radar/', 檔名為COMPREF.OpenData.yyyymmdd.HHMM.gz<br>
 向CWB請求資料下載時與查找資料之時間區間為使用台灣時間(UTC+8)<br>
 下載後之檔名與檔頭內容皆會轉為UTC<br>
 
@@ -40,9 +40,12 @@ sys.path.append('./cwb_opendata/')
 import cwb_opendata
 
 #################### Download data from CWB Open Data Bank (XML)
+# 以氣象會員授權碼下載資料(XML格式), 預設存於"./cwb_opendata_radar/xml"
 out_list = cwb_opendata.download(authorization="CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
+# cwb_opendata.download() will return filename str list
 
 #################### Convert XML to CWB radar binary file
+# 將XML轉檔成CWB雷達回波整合資料格式(預設存於"./cwb_opendata_radar/compref")
 # create array
 convert_out = []
 for fn1 in out_list:
@@ -51,18 +54,21 @@ for fn1 in out_list:
 
     convert_out.append(tmp) # append to array
 
+# cwb_opendata.xml2compref() will return filename (str)
+
 #################### Display CWB radar binary file head info
-metadata = cwb_opendata.dump_compref(filename=convert_out[-1], gzipped=True)
+# 取convert_out中的最後一個檔名為例
+metadata = cwb_opendata.dump_compref(filename=convert_out[-1])
 
 # display metadata, also can use "print(metadata)"
 for keys, value in metadata.items():
     print('{:9s} : {}'.format(keys, value))
 
+# cwb_opendata.dump_compref() will return python dictionary
+
 #################### Plot CWB radar binary file
-fig_name = cwb_opendata.plot_compref(
-    filename=convert_out[-1], gzipped=True, dpi=72, figsize=[49.67,49.67],
-    savefig=False, outpath='./cwb_opendata_radar/figure'
-    )
+# 預設dpi=96, figsize=[49.67, 49.67]  49.67英吋, 會畫出跟氣象局一樣的3600x3600之png
+fig_name = cwb_opendata.plot_compref(filename=convert_out[-1])
 print(fig_name)
 ```
 

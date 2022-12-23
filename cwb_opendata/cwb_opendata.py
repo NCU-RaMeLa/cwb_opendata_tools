@@ -194,8 +194,8 @@ def xml2compref(filename_in, filename_out, outpath="./cwb_opendata_radar/compref
     # allocate(zht(nz))
     proj = 'LL'
     map_scale = 1000
-    projlat1 = 30*map_scale
-    projlat2 = 60*map_scale
+    projlat0 = 30*map_scale
+    projlat1 = 60*map_scale
     projlon = 120.75*map_scale
     xy_scale = 1000
     alon = lon0*xy_scale
@@ -222,7 +222,7 @@ def xml2compref(filename_in, filename_out, outpath="./cwb_opendata_radar/compref
     
     buffer = np.array([yyyy,mm,dd,hh,mn,ss,nx,ny,nz], dtype='i4').tobytes()
     buffer += np.array(proj, dtype='a4').tobytes()
-    buffer += np.array([map_scale,projlat1,projlat2,projlon,alon,alat,xy_scale,dx,dy,
+    buffer += np.array([map_scale,projlat0,projlat1,projlon,alon,alat,xy_scale,dx,dy,
               dxy_scale,zht,z_scale,i_bb_mode], dtype='i4').tobytes()
     buffer += np.array(unkn01, dtype='i4').tobytes()
     buffer += np.array(varname1, dtype='a1').tobytes()
@@ -255,7 +255,7 @@ def dump_compref(filename, gzipped=True, **kwargs):
     buf = fid.read()
     yyyy,mm,dd,hh,mn,ss,nx,ny,nz = np.frombuffer(buf, dtype=np.int32, count=9)
     proj = np.frombuffer(buf, dtype='S4', count=1, offset=36)
-    map_scale,projlat1,projlat2,projlon = np.frombuffer(buf, dtype=np.int32, count=4, offset=40)
+    map_scale,projlat0,projlat1,projlon = np.frombuffer(buf, dtype=np.int32, count=4, offset=40)
     alon,alat,xy_scale,dx,dy,dxy_scale = np.frombuffer(buf, dtype=np.int32, count=6, offset=56)
     zht = np.frombuffer(buf, dtype=np.int32, count=nz, offset=80)
     z_scale,i_bb_mode = np.frombuffer(buf, dtype=np.int32, count=2, offset=80+4*nz)
@@ -291,7 +291,7 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
     buf = fid.read()
     yyyy,mm,dd,hh,mn,ss,nx,ny,nz = np.frombuffer(buf, dtype=np.int32, count=9)
     proj = np.frombuffer(buf, dtype='S4', count=1, offset=36)
-    map_scale,projlat1,projlat2,projlon = np.frombuffer(buf, dtype=np.int32, count=4, offset=40)
+    map_scale,projlat0,projlat1,projlon = np.frombuffer(buf, dtype=np.int32, count=4, offset=40)
     alon,alat,xy_scale,dx,dy,dxy_scale = np.frombuffer(buf, dtype=np.int32, count=6, offset=56)
     zht = np.frombuffer(buf, dtype=np.int32, count=nz, offset=80)
     z_scale,i_bb_mode = np.frombuffer(buf, dtype=np.int32, count=2, offset=80+4*nz)
