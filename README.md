@@ -27,7 +27,7 @@ P.S.若已解壓縮，則gzipped自行改成False
 # 下載 CWB Open weather data
 此module另有CWB open data雷達回波資料下載用插件方便下載雷達資料<br>
 (需要有氣象會員授權碼: CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)<br>
-預設存檔於 './radar/cwb_opendata_radar/', 檔名為COMPREF.OpenData.yyyymmdd.HHMM.gz<br>
+預設存檔於 './cwb_opendata_radar/', 檔名為COMPREF.OpenData.yyyymmdd.HHMM.???<br>
 向CWB請求資料下載時與查找資料之時間區間為使用台灣時間(UTC+8)<br>
 下載後之檔名與檔頭內容皆會轉為UTC<br>
 
