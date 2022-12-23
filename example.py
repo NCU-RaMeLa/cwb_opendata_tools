@@ -44,7 +44,11 @@ for keys, value in metadata.items():
 
 #################### Plot CWB radar binary file
 fig_name = cwb_opendata.plot_compref(
-    filename=convert_out[-1], gzipped=True, dpi=72, figsize=[49.67,49.67],
+    filename=convert_out[-1], gzipped=True, dpi=96, figsize=[49.67,49.67],
     savefig=False, outpath='./cwb_opendata_radar/figure'
     )
 print(fig_name)
+
+import importlib
+importlib.reload(cwb_opendata)
+cwb_opendata.plot_compref('/work1/mihzou/maple/COMPREF/2d/2021/COMPREF.20211127.1420.gz',dpi=72, figsize=[6,6])

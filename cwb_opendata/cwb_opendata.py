@@ -100,7 +100,7 @@ def download(
             url = TList[i]['url']
             data = request.urlopen(url).read().decode("utf-8")
             os.makedirs(outpath+'/'+tLyy+'/'+tLmm+'/'+tLdd, exist_ok=True)
-            fid = open(tLpath+'.xml', 'wt')
+            fid = open(tLpath+'.xml', 'w', encoding="utf-8")
             fid.write(data)
             fid.close()
 
@@ -405,7 +405,6 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
         [150,   0, 255, 255]
         ])/255
 
-    cwb_size = 49.67
     rcParams["figure.figsize"] = figsize
     rcParams["figure.dpi"] = dpi
     rcParams["figure.facecolor"] = 'w'
@@ -421,13 +420,32 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
     rcParams["xtick.major.bottom"] = False
     rcParams["ytick.major.left"] = False
 
-    fig = plt.figure(frameon=False)
-    size = fig.get_size_inches()
-    size_ratio = size[0]/cwb_size
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    #ax.set_extent([115, 126.5, 17.75, 29.25], crs=ccrs.PlateCarree())
+    shp_tw = './cwb_opendata/shapefiles/COUNTY_MOI_1080726.shp'
+    shp_cn = './cwb_opendata/shapefiles/CHN_adm0.shp'
+    shp_jp = './cwb_opendata/shapefiles/JPN_adm0.shp'
+    shp_ph = './cwb_opendata/shapefiles/PHL_adm0.shp'
 
-    #ax.add_feature(cfeature.LAND, facecolor='#e5e5e5')
+    fig = plt.figure(frameon=False)
+    ax = plt.axes(projection=ccrs.PlateCarree())
+
+    bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    width, height = bbox.width, bbox.height
+    width *= fig.dpi
+    height *= fig.dpi
+    size_ratio = height/3600.0816
+
+    ax.add_geometries(Reader(shp_cn).geometries(), ccrs.PlateCarree(),
+                      facecolor='#e5e5e5', edgecolor='none', zorder=1,
+                      linewidth=3*size_ratio)
+    ax.add_geometries(Reader(shp_jp).geometries(), ccrs.PlateCarree(),
+                      facecolor='#e5e5e5',  edgecolor='none', zorder=1,
+                      linewidth=3*size_ratio)
+    ax.add_geometries(Reader(shp_ph).geometries(), ccrs.PlateCarree(),
+                      facecolor='#e5e5e5', edgecolor='none', zorder=1,
+                      linewidth=3*size_ratio)
+    ax.add_geometries(Reader(shp_tw).geometries(), ccrs.PlateCarree(),
+                      facecolor='#e5e5e5', edgecolor='none', zorder=1,
+                      linewidth=3*size_ratio)
 
     cm = LinearSegmentedColormap.from_list('CWBcmap', CWBColor, N=66)
     cm.set_under(color=(0, 0, 0), alpha=0.04)
@@ -439,23 +457,18 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
 
     ax1 = plt.pcolormesh(lons, lats, dBZ, cmap=cm)
     ax1.set_clim(0,66)
-
-    shp_tw = './cwb_opendata/shapefiles/COUNTY_MOI_1080726.shp'
-    shp_cn = './cwb_opendata/shapefiles/CHN_adm0.shp'
-    shp_jp = './cwb_opendata/shapefiles/JPN_adm0.shp'
-    shp_ph = './cwb_opendata/shapefiles/PHL_adm0.shp'
-
+    
     ax.add_geometries(Reader(shp_cn).geometries(), ccrs.PlateCarree(),
-                      facecolor='#e5e5e5', edgecolor='#666666',
+                      facecolor='none', edgecolor='#666666',
                       linewidth=3*size_ratio)
     ax.add_geometries(Reader(shp_jp).geometries(), ccrs.PlateCarree(),
-                      facecolor='#e5e5e5',  edgecolor='#666666',
+                      facecolor='none',  edgecolor='#666666',
                       linewidth=3*size_ratio)
     ax.add_geometries(Reader(shp_ph).geometries(), ccrs.PlateCarree(),
-                      facecolor='#e5e5e5', edgecolor='#666666',
+                      facecolor='none', edgecolor='#666666',
                       linewidth=3*size_ratio)
     ax.add_geometries(Reader(shp_tw).geometries(), ccrs.PlateCarree(),
-                      facecolor='#e5e5e5', edgecolor='black',
+                      facecolor='none', edgecolor='black',
                       linewidth=3*size_ratio)
 
     plt.xticks(np.arange(115,126.5,1))
