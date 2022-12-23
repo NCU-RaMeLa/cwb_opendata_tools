@@ -45,6 +45,6 @@ for keys, value in metadata.items():
 #################### Plot CWB radar binary file
 fig_name = cwb_opendata.plot_compref(
     filename=convert_out[-1], gzipped=True, dpi=96, figsize=[49.67,49.67],
-    outpath='./cwb_opendata_radar/figure', dislpay=True
+    outpath='./cwb_opendata_radar/figure', display=True
     )
 print(fig_name)
