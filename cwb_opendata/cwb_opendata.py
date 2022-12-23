@@ -280,7 +280,7 @@ def dump_compref(filename, gzipped=True, **kwargs):
     )
     return metadata
 
-def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig=False, outpath="./cwb_opendata_radar/figure"):
+def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], outpath="./cwb_opendata_radar/figure", display=True):
 
     if gzipped is False:
         fid = open(filename, mode='rb')
@@ -419,6 +419,12 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
     rcParams["axes.grid"] = False
     rcParams["xtick.major.bottom"] = False
     rcParams["ytick.major.left"] = False
+    rcParams["figure.autolayout"] = True
+    rcParams["figure.constrained_layout.use"] = True
+    rcParams["figure.constrained_layout.h_pad"] = 0
+    rcParams["figure.constrained_layout.w_pad"] = 0
+    rcParams["figure.constrained_layout.hspace"] = 0
+    rcParams["figure.constrained_layout.wspace"] = 0
 
     shp_tw = './cwb_opendata/shapefiles/COUNTY_MOI_1080726.shp'
     shp_cn = './cwb_opendata/shapefiles/CHN_adm0.shp'
@@ -433,7 +439,7 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
     width *= fig.dpi
     height *= fig.dpi
     size_ratio = height/3600.0816
-
+    
     ax.add_geometries(Reader(shp_cn).geometries(), ccrs.PlateCarree(),
                       facecolor='#e5e5e5', edgecolor='none', zorder=1,
                       linewidth=3*size_ratio)
@@ -506,11 +512,18 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
                        fontsize=50*size_ratio,
                        weight='bold', alpha=0.98, color='gray')
         i -= 0.25
-    plt.show()
+    
     fn  = outpath + '/' + '/'.join([str(yyyy),str(mm).zfill(2),str(dd).zfill(2)])
     fn += '/CV1_open_' + str(yyyy) + str(mm).zfill(2) + str(dd).zfill(2)
     fn += str(hh).zfill(2) + str(mn).zfill(2) + '.png'
-    if savefig:
-        os.makedirs(outpath + '/' + '/'.join([str(yyyy),str(mm).zfill(2),str(dd).zfill(2)]), exist_ok=True)
-        plt.savefig(fn, bbox_inches='tight', dpi=fig.dpi, pad_inches=0.0)
+    
+    os.makedirs(outpath + '/' + '/'.join([str(yyyy),str(mm).zfill(2),str(dd).zfill(2)]), exist_ok=True)
+    plt.savefig(fn, bbox_inches='tight', dpi=fig.dpi, pad_inches=0.0)
+    plt.close('all')
+    
+    if display:
+        import matplotlib.image as img
+        image = img.imread(fn)
+        plt.imshow(image)
+        plt.show()
     return fn
