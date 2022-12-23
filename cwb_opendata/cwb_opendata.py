@@ -493,6 +493,7 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
                        weight='bold', alpha=0.98, color='gray')
         i -= 0.25
 
+    os.makedirs(outpath + '/' + '/'.join([str(yyyy),str(mm).zfill(2),str(dd).zfill(2)]), exist_ok=True)
     fn  = outpath + '/' + '/'.join([str(yyyy),str(mm).zfill(2),str(dd).zfill(2)]) + '/CV1_open_'
     fn += str(yyyy) + str(mm).zfill(2) + str(dd).zfill(2)
     fn += str(hh).zfill(2) + str(mn).zfill(2) + '.png'
