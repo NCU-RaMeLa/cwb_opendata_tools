@@ -412,6 +412,7 @@ def plot_compref(filename, gzipped=True, dpi=96, figsize=[49.67, 49.67], savefig
     rcParams["figure.dpi"] = dpi
     rcParams["figure.facecolor"] = 'w'
     rcParams["figure.edgecolor"] = 'k'
+    rcParams["figure.frameon"] = False
     rcParams["image.aspect"] = 1
     rcParams["axes.facecolor"] = 'w'
     rcParams["axes.spines.left"] = False
