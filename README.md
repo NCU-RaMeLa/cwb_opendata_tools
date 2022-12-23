@@ -33,64 +33,81 @@ P.S.若已解壓縮，則gzipped自行改成false
 
 ### 快速使用方式:
 ```python
-from pysteps_importer_cwb.importer_cwb_compref import download_cwb_opendata
+from datetime import datetime, timedelta
 
-download_data = download_cwb_opendata(authorization="CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
-# CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX 請自行替換成您的API授權碼
+import sys
+sys.path.append('./cwb_opendata/')
+import cwb_opendata
 
-'''
-Parameters
-    ----------
-    path : str (defualt = './radar/cwb_opendata')
-        檔案儲存路徑 (配合pySTEPS範例資料路徑)
+#################### Download data from CWB Open Data Bank (XML)
+out_list = cwb_opendata.download(authorization="CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
 
-    remove_old : bool (default = True)
-        True 或 False. True則會刪除給定的path資料夾
+#################### Convert XML to CWB radar binary file
+# create array
+convert_out = []
+for fn1 in out_list:
+    # xml2compref will return file path, save to temporary variable
+    tmp = cwb_opendata.xml2compref(filename_in=fn1, filename_out='.'.join(fn1.split('/')[-1].split('.')[:-1]))
 
-    authorization : str
-        * required 氣象開放資料平台會員授權碼
+    convert_out.append(tmp) # append to array
 
-    limit : int (default = 10)
-        限制最多回傳的資料, 預設為10
+#################### Display CWB radar binary file head info
+metadata = cwb_opendata.dump_compref(filename=convert_out[-1], gzipped=True)
 
-    offset : int (defaule = 0)
-        指定從第幾筆後開始回傳, 預設為第 0 筆開始回傳
+# display metadata, also can use "print(metadata)"
+for keys, value in metadata.items():
+    print('{:9s} : {}'.format(keys, value))
 
-    timeFrom : str (UTC+8)
-        時間區段, 篩選需要之時間區段，時間從「timeFrom」開始篩選，直到內容之最後時間，並可與參數「timeTo」 合併使用，格式為「yyyy-MM-dd hh:mm:ss」
-
-    timeTo : str (UTC+8)
-        時間區段, 篩選需要之時間區段，時間從內容之最初時間開始篩選，直到「timeTo」，並可與參數「timeFrom」 合併使用，格式為「yyyy-MM-ddThh:mm:ss」
-'''
+#################### Plot CWB radar binary file
+fig_name = cwb_opendata.plot_compref(
+    filename=convert_out[-1], gzipped=True, dpi=72, figsize=[49.67,49.67],
+    savefig=False, outpath='./cwb_opendata_radar/figure'
+    )
+print(fig_name)
 ```
-
-若為快速使用方式, 預設存儲路徑為 ./radar/cwb_opendata<br>
-會先刪除 ./radar/cwb_opendata 資料夾後再重新建立資料夾進行下載<br>
-並從 https://opendata.cwb.gov.tw 下載最新10筆雷達回波資料<br>
 
 ### 進階使用:
 ```python
-from pysteps_importer_cwb.importer_cwb_compref import download_cwb_opendata
+from datetime import datetime, timedelta
 
-download_data = download_cwb_opendata(
-    path="./radar/cwb_opendata",
-    remove_exist=False, # 不刪除任何資料(!!硬碟使用將會越來越多!!)
+import sys
+sys.path.append('./cwb_opendata/')
+import cwb_opendata
+
+#################### Download data from CWB Open Data Bank (XML)
+out_list = cwb_opendata.download(
+    outpath="./cwb_opendata_radar/xml",
+    remove_exist=True,
     authorization="CWB-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
-    limit=20, # 回傳20筆清單
-    offset=3, # 從第 3 筆開始回傳
-    timeFrom="2022-12-06 10:22:32", # 從 2022/12/06 10:22:32 (UTC+8) 開始
-    timeTo="2022-12-20 05:12:49" # 到 2022/12/20 05:12:49 (UTC+8) 結束, 此時間段CWB擁有的資料
-    )
-```
+    limit=None,
+    offset=0,
+    timeFrom=(datetime.now()-timedelta(seconds=3600*1)).strftime("%Y-%m-%d %H:%M:%S"),
+    timeTo=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-接著修改 importer 所需要的資訊, 將
-```python
-root_path="./radar/cwb"
-fn_pattern="COMPREF.%Y%m%d.%H%M"
+#################### Convert XML to CWB radar binary file
+# create array
+convert_out = []
+for fn1 in out_list:
+    # xml2compref will return file path, save to temporary variable
+    tmp = cwb_opendata.xml2compref(
+        filename_in=fn1,
+        filename_out='.'.join(fn1.split('/')[-1].split('.')[:-1]),
+        outpath='./cwb_opendata_radar/compref',
+        gzipped=True)
+    
+    convert_out.append(tmp) # append to array
+
+#################### Display CWB radar binary file head info
+metadata = cwb_opendata.dump_compref(filename=convert_out[-1], gzipped=True)
+
+# display metadata, also can use "print(metadata)"
+for keys, value in metadata.items():
+    print('{:9s} : {}'.format(keys, value))
+
+#################### Plot CWB radar binary file
+fig_name = cwb_opendata.plot_compref(
+    filename=convert_out[-1], gzipped=True, dpi=72, figsize=[49.67,49.67],
+    savefig=False, outpath='./cwb_opendata_radar/figure'
+    )
+print(fig_name)
 ```
-改成
-```python
-root_path="./radar/cwb_opendata"
-fn_pattern="COMPREF.OpenData.%Y%m%d.%H%M"
-```
-即可應用於pySTEPS中
